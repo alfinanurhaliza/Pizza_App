@@ -3,25 +3,27 @@ package com.example.pizzaapp
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
-import android.media.Image
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.ActionMode
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import com.example.pizzaapp.model.MenuModel
 
-class AddMenuActivity : AppCompatActivity() {
+class EditMenuActivity : AppCompatActivity() {
     lateinit var image: ImageView
     companion object{
         val IMAGE_REQUEST_CODE = 100
+        var idMakanan = 1
+        var namaMakanan = "tes"
+        var hargaMakanan = 100000
+        lateinit var gambarMakanan : Bitmap
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_menu)
+        setContentView(R.layout.activity_edit_menu)
 
-        //hide title bar
         getSupportActionBar()?.hide()
 
         //intance
@@ -30,14 +32,19 @@ class AddMenuActivity : AppCompatActivity() {
         val textName : EditText = findViewById(R.id.menuName)
         val textPrice : EditText = findViewById(R.id.menuPrice)
         val btnAddImage : Button = findViewById(R.id.buttonAddImage)
-        val btnSaveMenu : Button = findViewById(R.id.buttonSaveMenu)
+        val btnEditMakanan : Button = findViewById(R.id.buttonEditMakanan)
+
+        //set data
+        textId.setText(idMakanan.toString())
+        textName.setText(namaMakanan)
+        textPrice.setText(hargaMakanan.toString())
+        image.setImageBitmap(gambarMakanan)
 
         //event saat button add (+) di-klik
         btnAddImage.setOnClickListener{
             pickImageGalery()
         }
-        //event saat button save di klik
-        btnSaveMenu.setOnClickListener {
+        btnUpdate.setOnClickListener{
             val databaseHelper = DatabaseHelper(this)
 
             val id : Int = textId.text.toString().toInt()
@@ -47,24 +54,24 @@ class AddMenuActivity : AppCompatActivity() {
             val bitmap : Bitmap = bitmapDrawable.bitmap
 
             val menuModel = MenuModel(id,name,price,bitmap)
-            databaseHelper.addMenu(menuModel)
+            databaseHelper.addEdit(menuModel)
 
             //inten main activity
             val intent = Intent(this, MainActivity::class.java)
             startActivity(intent)
         }
     }
+}
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == IMAGE_REQUEST_CODE && resultCode == RESULT_OK){
-            image.setImageURI(data?.data)
-        }
+        override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+            super.onActivityResult(requestCode, resultCode, data)
+            if(requestCode == AddMenuActivity.IMAGE_REQUEST_CODE && resultCode == AppCompatActivity.RESULT_OK){
+                image.setImageURI(data?.data)
     }
-    //fungsi pickImageGalery
-    private fun pickImageGalery() {
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/"
-        startActivityForResult(intent, IMAGE_REQUEST_CODE)
-    }
+}
+        //fungsi pickImageGalery
+        private fun pickImageGalery() {
+            val intent = Intent(Intent.ACTION_PICK)
+            intent.type = "image/"
+            startActivityForResult(intent, AddMenuActivity.IMAGE_REQUEST_CODE)
 }
